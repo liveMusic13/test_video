@@ -11,6 +11,7 @@ const Video = () => {
 	const [capturedPhoto, setCapturedPhoto] = useState(null);
 	const [capturedVideo, setCapturedVideo] = useState(null); // Для сохранения видео
 	const [useFrontCamera, setUseFrontCamera] = useState(true);
+	const [error, setError] = useState('');
 
 	// Открыть камеру
 	async function openCamera() {
@@ -60,6 +61,7 @@ const Video = () => {
 			mediaRecorderRef.current.start();
 			setIsRecording(true);
 		} else {
+			setError('MediaRecorder не инициализирован');
 			console.error('MediaRecorder не инициализирован');
 		}
 	};
@@ -78,6 +80,7 @@ const Video = () => {
 			const blob = new Blob(recordedChunks, { type: 'video/webm' });
 			const url = URL.createObjectURL(blob);
 			setCapturedVideo(url); // Сохраняем URL для просмотра видео
+			setError(url);
 		}
 	}, [recordedChunks]);
 
@@ -107,6 +110,7 @@ const Video = () => {
 
 	return (
 		<div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
+			<p>{error}</p>
 			<video
 				ref={videoRef}
 				width='100%'
