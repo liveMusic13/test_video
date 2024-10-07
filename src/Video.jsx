@@ -136,7 +136,7 @@ const Video = () => {
 	// Сохранить и показать видео
 	useEffect(() => {
 		if (recordedChunks.length > 0) {
-			const blob = new Blob(recordedChunks, { type: 'video/webm' });
+			const blob = new Blob(recordedChunks, { type: 'video/mp4' });
 			const url = URL.createObjectURL(blob);
 			setCapturedVideo(url); // Сохраняем URL для просмотра видео
 			setError(url);
