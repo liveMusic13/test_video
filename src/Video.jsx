@@ -6,6 +6,7 @@ import { useRef, useState } from 'react';
 // 	const [isRecording, setIsRecording] = useState(false); // Статус записи
 // 	const [recordedChunks, setRecordedChunks] = useState([]); // Хранение записанных данных
 // 	const streamRef = useRef(null); // Ссылка на видеопоток
+// 	const [capturedPhoto, setCapturedPhoto] = useState(null); // Хранение сделанного фото
 
 // 	// Открываем камеру и транслируем видео в <video> элемент
 // 	async function openCamera() {
@@ -73,6 +74,19 @@ import { useRef, useState } from 'react';
 // 		window.URL.revokeObjectURL(url);
 // 	};
 
+// 	// Сделать фото с камеры
+// 	const capturePhoto = () => {
+// 		const canvas = document.createElement('canvas');
+// 		const context = canvas.getContext('2d');
+// 		canvas.width = videoRef.current.videoWidth;
+// 		canvas.height = videoRef.current.videoHeight;
+// 		context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+
+// 		// Преобразуем canvas в изображение
+// 		const dataUrl = canvas.toDataURL('image/png');
+// 		setCapturedPhoto(dataUrl); // Сохраняем фото
+// 	};
+
 // 	return (
 // 		<div>
 // 			<video ref={videoRef} width='400' height='300' controls />
@@ -85,10 +99,24 @@ import { useRef, useState } from 'react';
 // 				<button onClick={saveVideo} disabled={recordedChunks.length === 0}>
 // 					Save Video
 // 				</button>
-// 				<button onClick={closeCamera}>Close Camera</button>{' '}
-// 				{/* Кнопка для отключения камеры */}
+// 				<button onClick={closeCamera}>Close Camera</button>
+// 				{/* Кнопка для захвата фото */}
+// 				<button onClick={capturePhoto}>Take Photo</button>
 // 			</div>
+
 // 			<button onClick={openCamera}>Open Camera</button>
+
+// 			{/* Отображение сделанного фото */}
+// 			{capturedPhoto && (
+// 				<div>
+// 					<h3>Captured Photo:</h3>
+// 					<img
+// 						src={capturedPhoto}
+// 						alt='Captured'
+// 						style={{ width: '400px', height: '300px' }}
+// 					/>
+// 				</div>
+// 			)}
 // 		</div>
 // 	);
 // };
@@ -100,12 +128,15 @@ const Video = () => {
 	const [recordedChunks, setRecordedChunks] = useState([]); // Хранение записанных данных
 	const streamRef = useRef(null); // Ссылка на видеопоток
 	const [capturedPhoto, setCapturedPhoto] = useState(null); // Хранение сделанного фото
+	const [useFrontCamera, setUseFrontCamera] = useState(true); // Состояние для переключения камеры
 
-	// Открываем камеру и транслируем видео в <video> элемент
+	// Открываем камеру с учётом выбранной камеры (фронтальная или задняя)
 	async function openCamera() {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({
-				video: true, // Запрашиваем доступ к камере
+				video: {
+					facingMode: useFrontCamera ? 'user' : 'environment', // Переключение между камерами
+				},
 			});
 			streamRef.current = stream; // Сохраняем поток для последующего отключения
 			videoRef.current.srcObject = stream; // Отображаем поток в элементе <video>
@@ -180,6 +211,13 @@ const Video = () => {
 		setCapturedPhoto(dataUrl); // Сохраняем фото
 	};
 
+	// Переключение между камерами
+	const toggleCamera = () => {
+		closeCamera(); // Сначала отключаем текущую камеру
+		setUseFrontCamera(prev => !prev); // Переключаемся между фронтальной и задней камерой
+		openCamera(); // Открываем камеру с новым режимом
+	};
+
 	return (
 		<div>
 			<video ref={videoRef} width='400' height='300' controls />
@@ -193,8 +231,10 @@ const Video = () => {
 					Save Video
 				</button>
 				<button onClick={closeCamera}>Close Camera</button>
-				{/* Кнопка для захвата фото */}
 				<button onClick={capturePhoto}>Take Photo</button>
+				<button onClick={toggleCamera}>
+					{useFrontCamera ? 'Switch to Rear Camera' : 'Switch to Front Camera'}
+				</button>
 			</div>
 
 			<button onClick={openCamera}>Open Camera</button>
