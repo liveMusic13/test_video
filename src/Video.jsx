@@ -13,48 +13,73 @@ const Video = () => {
 	const [useFrontCamera, setUseFrontCamera] = useState(true);
 	const [error, setError] = useState('');
 
-	// Открыть камеру
-	async function openCamera() {
+	// // Открыть камеру
+	// async function openCamera() {
+	// 	try {
+	// 		const stream = await navigator.mediaDevices.getUserMedia({
+	// 			video: {
+	// 				facingMode: useFrontCamera ? 'user' : 'environment',
+	// 			},
+	// 		});
+	// 		streamRef.current = stream;
+	// 		videoRef.current.srcObject = stream;
+	// 		videoRef.current.play();
+
+	// 		// Отключаем возможность открыть видео в полный экран
+	// 		videoRef.current.addEventListener('click', event =>
+	// 			event.preventDefault()
+	// 		);
+	// 		videoRef.current.webkitPlaysInline = true;
+	// 		videoRef.current.playsInline = true;
+
+	// 		// MediaRecorder для записи видео
+	// 		mediaRecorderRef.current = new MediaRecorder(stream, {
+	// 			mimeType: 'video/webm',
+	// 		});
+	// 		mediaRecorderRef.current.ondataavailable = event => {
+	// 			if (event.data.size > 0) {
+	// 				setRecordedChunks(prev => [...prev, event.data]);
+	// 			}
+	// 		};
+	// 	} catch (err) {
+	// 		console.error('Ошибка доступа к камере:', err);
+	// 	}
+	// }
+
+	const openCamera = async () => {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({
 				video: {
 					facingMode: useFrontCamera ? 'user' : 'environment',
 				},
 			});
+
 			streamRef.current = stream;
-			videoRef.current.srcObject = stream;
-			videoRef.current.play();
 
-			// Отключаем возможность открыть видео в полный экран
-			videoRef.current.addEventListener('click', event =>
-				event.preventDefault()
-			);
-			videoRef.current.webkitPlaysInline = true;
-			videoRef.current.playsInline = true;
+			if (videoRef.current) {
+				videoRef.current.srcObject = stream;
+				videoRef.current.play();
+			}
 
-			// MediaRecorder для записи видео
-			mediaRecorderRef.current = new MediaRecorder(stream, {
-				mimeType: 'video/webm',
-			});
-			mediaRecorderRef.current.ondataavailable = event => {
-				if (event.data.size > 0) {
-					setRecordedChunks(prev => [...prev, event.data]);
-				}
-			};
+			if (stream && typeof MediaRecorder !== 'undefined') {
+				mediaRecorderRef.current = new MediaRecorder(stream, {
+					mimeType: 'video/webm;codecs=vp8',
+				});
+
+				mediaRecorderRef.current.ondataavailable = event => {
+					if (event.data.size > 0) {
+						setRecordedChunks(prev => [...prev, event.data]);
+					}
+				};
+			} else {
+				setError('MediaRecorder не поддерживается на этом устройстве.');
+			}
 		} catch (err) {
+			setError('Ошибка доступа к камере: ' + err.message);
 			console.error('Ошибка доступа к камере:', err);
-		}
-	}
-
-	// Закрытие камеры
-	const closeCamera = () => {
-		if (streamRef.current) {
-			streamRef.current.getTracks().forEach(track => track.stop());
-			streamRef.current = null;
 		}
 	};
 
-	// Начать запись
 	const startRecording = () => {
 		if (mediaRecorderRef.current) {
 			setRecordedChunks([]);
@@ -65,6 +90,26 @@ const Video = () => {
 			console.error('MediaRecorder не инициализирован');
 		}
 	};
+
+	// Закрытие камеры
+	const closeCamera = () => {
+		if (streamRef.current) {
+			streamRef.current.getTracks().forEach(track => track.stop());
+			streamRef.current = null;
+		}
+	};
+
+	// // Начать запись
+	// const startRecording = () => {
+	// 	if (mediaRecorderRef.current) {
+	// 		setRecordedChunks([]);
+	// 		mediaRecorderRef.current.start();
+	// 		setIsRecording(true);
+	// 	} else {
+	// 		setError('MediaRecorder не инициализирован');
+	// 		console.error('MediaRecorder не инициализирован');
+	// 	}
+	// };
 
 	// Остановить запись
 	const stopRecording = () => {
