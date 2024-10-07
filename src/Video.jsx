@@ -156,6 +156,7 @@ const Video = () => {
 	return (
 		<div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
 			<p>{error}</p>
+			<p>{error}</p>
 			<video
 				ref={videoRef}
 				width='100%'
