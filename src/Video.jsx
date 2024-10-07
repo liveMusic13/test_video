@@ -220,7 +220,7 @@ const Video = () => {
 
 	return (
 		<div>
-			<video ref={videoRef} width='400' height='300' controls />
+			<video ref={videoRef} width='400' height='300' autoPlay />
 			<div>
 				{!isRecording ? (
 					<button onClick={startRecording}>Start Recording</button>
