@@ -63,7 +63,8 @@ const Video = () => {
 
 			if (stream && typeof MediaRecorder !== 'undefined') {
 				mediaRecorderRef.current = new MediaRecorder(stream, {
-					mimeType: 'video/webm;codecs=vp8',
+					// mimeType: 'video/webm;codecs=vp8',
+					mimeType: 'video/mp4',
 				});
 
 				mediaRecorderRef.current.ondataavailable = event => {
@@ -80,14 +81,27 @@ const Video = () => {
 		}
 	};
 
+	// const startRecording = () => {
+	// 	if (mediaRecorderRef.current) {
+	// 		setRecordedChunks([]);
+	// 		mediaRecorderRef.current.start();
+	// 		setIsRecording(true);
+	// 	} else {
+	// 		setError('MediaRecorder не инициализирован');
+	// 		console.error('MediaRecorder не инициализирован');
+	// 	}
+	// };
 	const startRecording = () => {
-		if (mediaRecorderRef.current) {
+		if (
+			mediaRecorderRef.current &&
+			mediaRecorderRef.current.state === 'inactive'
+		) {
 			setRecordedChunks([]);
 			mediaRecorderRef.current.start();
 			setIsRecording(true);
 		} else {
-			setError('MediaRecorder не инициализирован');
-			console.error('MediaRecorder не инициализирован');
+			setError('MediaRecorder не инициализирован или уже записывает');
+			console.error('MediaRecorder не инициализирован или уже записывает');
 		}
 	};
 
