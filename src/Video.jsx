@@ -243,6 +243,7 @@ const Video = () => {
 					objectFit: 'cover',
 					width: '100%',
 					height: '300px',
+					touchAction: 'none', // Отключаем взаимодействие с видео
 				}}
 			/>
 
