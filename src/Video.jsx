@@ -63,8 +63,8 @@ const Video = () => {
 
 			if (stream && typeof MediaRecorder !== 'undefined') {
 				mediaRecorderRef.current = new MediaRecorder(stream, {
-					// mimeType: 'video/webm;codecs=vp8',
-					mimeType: 'video/mp4',
+					mimeType: 'video/webm',
+					// mimeType: 'video/mp4',
 				});
 
 				mediaRecorderRef.current.ondataavailable = event => {
@@ -136,7 +136,8 @@ const Video = () => {
 	// Сохранить и показать видео
 	useEffect(() => {
 		if (recordedChunks.length > 0) {
-			const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+			// const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+			const blob = new Blob(recordedChunks, { type: 'video/webm' });
 			const url = URL.createObjectURL(blob);
 			setCapturedVideo(url); // Сохраняем URL для просмотра видео
 			setError(url);
